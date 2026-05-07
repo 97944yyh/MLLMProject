@@ -1,0 +1,55 @@
+\chapter{绪论}
+
+\section{任务定义与任务背景}
+
+\subsection{任务定义} 
+
+本项目旨在构建一个集文档解析、视觉定位与自然语言理解于一体的能够自主决策选择最优模型的“文档智能助手”。系统集成 LLaMA 3.2 Vision、Qwen2.5-VL、DeepSeek-VL 等开源的多模态大模型，能够对多模态文档如 PDF、PPT截图、视频中的图片、表格、公式和图表进行识别与理解，并通过多模态 RAG 实现长文档精准检索与结构化问答，同时输出可溯源的页码与图表引用。
+核心任务主要有：
+
+\begin{itemize}
+    \item 多模态 RAG 架构构建：建立统一的向量索引池，将文本语义、表格结构描述与图像/视频的视觉特征进行跨模态对齐
+    \item 通过强化学习（如 GRPO）训练轻量化决策模型，根据用户查询问题的类型选择不同的VLM模型进行推理，使得系统更加智能化
+    \item 可解释性溯源：在生成回答的同时，精准定位并标注引用的页面坐标、图表编号或视频时间戳
+\end{itemize}
+
+\subsection{项目背景} 
+
+在企业办公与科研场景中，尽管 LLM 具备卓越的生成能力，但是仍然存在静态知识滞后、核心的隐私数据无法用来训练、缺乏明确事实依据的幻觉等问题。
+
+为了解决这一点 RAG（Retrieval-Augmented Generation）成为了主流的解决方案，通过引入外部知识库进行检索来增强生成的准确性和时效性。
+
+然而，传统的 RAG 主要针对纯文本数据设计，忽略了文档中丰富的视觉结构信息，关键信息往往都是碎片化分布于非结构化文档，如图表、表格、公式等，这些信息往往是理解复杂文档的关键。
+
+随着多模态大语言模型（MLLM）的快速发展，能够直接处理视觉输入的能力使得多模态 RAG 成为提升文档理解效率的关键技术路径。因此，设计一个兼顾多模态检索、精确定位与可解释溯源的工程化方案对于满足复杂文档问答需求具有重要意义。
+
+
+\section{相关工作调研}
+
+
+\begin{itemize}
+
+    \item \textit{RAG-Anything: All-in-One RAG Framework} \cite{guo2025raganythingallinoneragframework}
+    
+    该框架构建了覆盖 PDF 与图像等文件的全模态解析流水线。它利用专业结构模型提取文本和公式图表，再通过智能分类路由将元素分发并融合为多模态知识图谱。最终系统基于图谱遍历与向量检索双轨机制，实现了在长难文档语境下更完整、具上下文连续性的证据召回与生成回答。
+
+    \item \textit{Scaling Beyond Context: A Survey of Multimodal Retrieval-Augmented Generation for Document Understanding} \cite{gao2025scaling}
+    
+    该综述探讨了多模态 RAG 克服传统 OCR 提取局限的技术路径，强调通过视觉模型直接理解图表与排版。文章指出现有技术的演进方向包括从纯文本向混合模态检索升级、实现页面内特定元素的细粒度检索，以及引入智能代理与知识图谱完成跨页及复杂的逻辑推理，从而提高复杂文档证据提取的真实性。
+
+    \item \textit{ColPali: Efficient Document Retrieval with Vision Language Models} \cite{faysse2024colpali}
+    
+    ColPali 提出了一种摒弃繁琐 OCR 预处理的端到端视觉空间检索架构。通过将视觉语言模型直接应用于文档图像嵌入，并结合延迟交互机制计算细粒度匹配分数，该模型在极其复杂的版面中实现了高速且极其精确的检索响应。其证明了原生多模态视觉编码在效率与准确度上均大幅优于传统的文本化 RAG 流程。
+
+    \item \textit{DeepSeek-OCR 2: Visual Causal Flow} \cite{wei2026deepseekocr2visualcausal}
+    
+    DeepSeek-OCR-2 引入机制模拟人类阅读顺序对文档页面进行视觉编码。它能直接将多页复杂文档转化为包含排版与定位框标记等视觉结构信息的 Markdown 文件。作为文档智能问答系统的前端基石，该系统能为后续的向量切块检索与多模态模型推理问答提供极具高质量与强结构化的上下文支持素材。
+
+    \item \textit{Efficient Motion-Aware Video MLLM} \cite{zhao2025efficientmotionawarevideomllm}
+    
+    该研究设计了一种能够高效处理动态视频序列的运动感知多模态大模型。系统通过特征层面融合视觉外观与连续运动时序线索，显著增强了应对运动目标和场景转换的捕捉性能。该机制及其优化技术极大压缩了计算耗时并保障了推理速度，为包含视频形式的多模态文档检索体系提供了关键手段。
+
+    \item \textit{RAGFlow 项目：Github} \url{https://github.com/infiniflow/ragflow}
+    
+    RAGFlow 是一款为处理复杂排版数据而构建的开源 RAG 框架。该项目基于内置的深度视觉解析模型还原版面内容并在不破坏原件结构前提下精确分块，更通过强制约束在生成推断的同时提供高度可靠的溯源标签。它为文档检索系统中的图文来源校验与防幻觉设计赋予了成熟高效的工程化经验借鉴。
+\end{itemize}

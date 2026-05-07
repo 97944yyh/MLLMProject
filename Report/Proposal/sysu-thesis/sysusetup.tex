@@ -1,7 +1,7 @@
 % !TeX root = ./main.tex
 
 \sysusetup{
-  title                = {多模态大模型原理与应用项目开题报告},
+  title                = {基于强化学习决策的文档理解与检索多模态问答系统},
   author               = {刘天翔\quad 杨毅涵\quad 郭翊涛},
   author*              = {WANG Xiaoming},
   speciality           = {计算机科学与技术},
@@ -29,6 +29,23 @@
 \makeatletter
 \renewcommand\sysu@thesis@name{多模态大模型项目开题报告}
 \renewcommand\sysu@title@page@bachelor{}
+\ifsysu@degree@bachelor
+  \fancypagestyle{plain}{%
+    \fancyhf{}%
+    \def\sysu@hf@font{\fontsize{10.5bp}{17.5bp}\selectfont}%
+    \fancyhead[C]{\sysu@hf@font 多模态大模型项目开题报告}%
+    \fancyfoot[C]{\sysu@hf@font\thepage}%
+    \let\@mkboth\@gobbletwo
+    \let\chaptermark\@gobble
+    \let\sectionmark\@gobble
+  }%
+  \fancypagestyle{headings}{%
+    \fancyhf{}%
+    \def\sysu@hf@font{\fontsize{10.5bp}{17.5bp}\selectfont}%
+    \fancyhead[C]{\sysu@hf@font 多模态大模型项目开题报告}%
+    \fancyfoot[C]{\sysu@hf@font\thepage}%
+  }%
+\fi
 \makeatother
 
 % 自动检测我们定制的 Dev Container 环境并替换 CJK 字体，保持跨平台兼容性
