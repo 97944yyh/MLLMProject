@@ -17,6 +17,7 @@ Date: 2026-06-15
 - 多模态模型：已接入本地 `Qwen3-VL-8B-Instruct`，BF16 推理可用。
 - 视觉摘要：Qwen3-VL 可以对 PDF 页面截图生成中文视觉摘要。
 - 回答生成：Qwen3-VL 可基于检索证据生成答案。
+- 完整 MM-RAG：已完成 11 页 PDF 全量视觉摘要索引，并完成 `mm-rag` / `auto` 评测。
 - Citation 对齐：模型只输出 `[E1]` 等证据编号，后端统一生成 page/chunk citation，避免模型自写来源和结构化 citation 不一致。
 - 评测：支持 `gold_pages` 多页答案，修正了样例页码标注。
 
@@ -46,8 +47,10 @@ Date: 2026-06-15
 
 - 页数：11
 - 文本 chunks：14
+- 页面级 visual chunks：11
 - 索引类型：FAISS
 - 真实 Text-RAG 构建耗时：约 9-11 秒
+- 完整 MM-RAG 构建耗时：约 146.6 秒
 
 Qwen3-VL 页面视觉分析表现：
 
@@ -72,6 +75,21 @@ Qwen3-VL 页面视觉分析表现：
 | Citation Accuracy | 1.0 |
 | Case Success Rate | 1.0 |
 
+完整 MM-RAG 全流程验收结果：
+
+| Mode | Recall@1 | Recall@5 | MRR | Citation Accuracy | Case Success Rate | Avg Latency |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| mm-rag | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 25967 ms |
+| auto | 1.0 | 1.0 | 1.0 | 1.0 | 1.0 | 12673 ms |
+
+完整 MM-RAG 构建输出：
+
+- 总 chunks：25
+- 文本 chunks：14
+- 页面级 visual chunks：11
+- 页面视觉摘要已进入 FAISS 混合索引
+- 验收结果已写入 `data/eval/results/real_mm_rag_full_summary.json`
+
 仍为 0 的指标：
 
 - EM
@@ -81,7 +99,6 @@ Qwen3-VL 页面视觉分析表现：
 
 ### 1.5 当前后端限制
 
-- 当前真实评测主要验证了 Text-RAG，完整 MM-RAG 还没有全量跑 11 页视觉摘要索引。
 - Qwen3-VL 全页视觉摘要速度较慢，整篇 11 页预计约 1.5-2 分钟。
 - 表格/图像/公式区域检测仍是页面级或占位式能力，还没有接入真实 layout detector。
 - HTTP API 尚未实现，React 前端目前仍是 mock 数据。
