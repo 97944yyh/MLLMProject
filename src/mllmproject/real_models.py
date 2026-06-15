@@ -242,14 +242,32 @@ def build_grounded_answer_prompt(
 ) -> str:
     evidence_lines = []
     for index, evidence in enumerate(evidences, start=1):
+        metadata_notes = evidence_prompt_metadata(evidence)
         evidence_lines.append(
             "\n".join(
                 [
                     f"[E{index}] page={evidence.page}, type={evidence.source_type}, "
                     f"chunk={evidence.chunk_id or evidence.evidence_id}, score={evidence.score:.4f}",
+                    metadata_notes,
                     compact(evidence.content, 900),
                 ]
             )
+        )
+    chart_instruction = ""
+    if any(evidence.source_type == "chart_region" for evidence in evidences):
+        chart_instruction = (
+            "\n图表题要求：先识别图表中的类别、数值、坐标轴或图例；"
+            "如果 chart_question_type=count，只数题目要求的类别、柱子或可见 item，"
+            "不要把年份、坐标轴刻度、数值标签、标题或图例文字算进去；"
+            "如果是 count/difference/min/max/value 题，Final answer 只能写数字；"
+            "如果是 Yes/No 比较题，Final answer 只能写 Yes 或 No。"
+        )
+    target_instruction = ""
+    if any((evidence.metadata or {}).get("target_value") for evidence in evidences):
+        target_instruction = (
+            "\n局部读数要求：如果证据标出 target_value，请围绕该目标年份或目标数值，"
+            "结合左侧/下方坐标轴和对应曲线、柱子位置读数；不要只抄最近的坐标轴刻度。"
+            "Final answer 只写读出的短数值或实体。"
         )
     return (
         "你是一个多模态文档问答后端。请只依据给定证据回答，不能编造。"
@@ -261,8 +279,27 @@ def build_grounded_answer_prompt(
         f"路由原因：{route_reason}\n"
         "证据：\n"
         + "\n\n".join(evidence_lines)
+        + chart_instruction
+        + target_instruction
         + "\n\n请输出中文答案，并在相关句子后使用证据编号，例如 [E1]。"
+        "最后一行必须严格使用格式：Final answer: <short answer>。"
     )
+
+
+def evidence_prompt_metadata(evidence: Evidence) -> str:
+    metadata = evidence.metadata or {}
+    parts = []
+    if metadata.get("page_bbox"):
+        parts.append(f"page_bbox={metadata['page_bbox']}")
+    if metadata.get("chart_question_type"):
+        parts.append(f"chart_question_type={metadata['chart_question_type']}")
+    if metadata.get("chart_numbers"):
+        parts.append("chart_numbers=" + ", ".join(str(value) for value in metadata["chart_numbers"][:20]))
+    if metadata.get("chart_labels"):
+        parts.append("chart_labels=" + ", ".join(str(value) for value in metadata["chart_labels"][:20]))
+    if metadata.get("target_value"):
+        parts.append(f"target_value={metadata['target_value']}")
+    return "; ".join(parts)
 
 
 def stable_citations(evidences: list[Evidence], limit: int = 3) -> list[Citation]:

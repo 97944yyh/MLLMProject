@@ -19,6 +19,11 @@ real = [
     "torch>=2.3.0",
     "transformers>=4.57.0",
 ]
+benchmarks = [
+    "datasets>=2.20.0",
+    "easyocr>=1.7.2",
+    "tqdm>=4.66.0",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

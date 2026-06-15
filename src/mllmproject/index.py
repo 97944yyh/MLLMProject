@@ -80,6 +80,11 @@ class FaissVectorIndex(VectorIndex):
         import numpy as np
 
         self.chunks = list(chunks)
+        if not self.chunks:
+            self.vectors = np.empty((0, 0), dtype="float32")
+            self.dim = None
+            self.faiss_index = None
+            return
         vectors = self.embedder.embed_text([chunk.content for chunk in self.chunks])
         array = np.asarray(vectors, dtype="float32")
         if array.ndim != 2:

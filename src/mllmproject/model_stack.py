@@ -30,6 +30,8 @@ class ModelConfig:
     dtype: str = "bf16"
     device_map: str | None = "auto"
     enable_vlm_summary: bool = True
+    vlm_max_new_tokens: int = 512
+    vlm_max_images: int = 3
     embedding_device: str | None = None
     reranker_device: str | None = None
     attn_implementation: str | None = None
@@ -45,6 +47,8 @@ class ModelConfig:
             dtype=os.getenv("MLLMPROJECT_TORCH_DTYPE", "bf16"),
             device_map=none_if_empty(os.getenv("MLLMPROJECT_DEVICE_MAP", "auto")),
             enable_vlm_summary=parse_bool(os.getenv("MLLMPROJECT_ENABLE_VLM_SUMMARY"), default=True),
+            vlm_max_new_tokens=int(os.getenv("MLLMPROJECT_VLM_MAX_NEW_TOKENS", "512")),
+            vlm_max_images=int(os.getenv("MLLMPROJECT_VLM_MAX_IMAGES", "3")),
             embedding_device=none_if_empty(os.getenv("MLLMPROJECT_EMBEDDING_DEVICE")),
             reranker_device=none_if_empty(os.getenv("MLLMPROJECT_RERANKER_DEVICE")),
             attn_implementation=none_if_empty(os.getenv("MLLMPROJECT_ATTENTION_IMPL")),
@@ -102,6 +106,8 @@ class ModelStack:
                     dtype=self.config.dtype,
                     device_map=self.config.device_map,
                     attn_implementation=self.config.attn_implementation,
+                    max_new_tokens=self.config.vlm_max_new_tokens,
+                    max_images=self.config.vlm_max_images,
                 )
             )
         return self._qwen3_vl
